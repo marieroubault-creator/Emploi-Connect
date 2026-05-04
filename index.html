@@ -27,7 +27,7 @@ body{
   touch-action:none;
 }
 
-/* 🎈 BULLES BACKGROUND */
+/* 🎈 BULLES */
 .bubble{
   position:absolute;
   bottom:-100px;
@@ -36,20 +36,16 @@ body{
   animation:rise linear infinite;
   z-index:0;
   pointer-events:none;
-  filter: blur(1px);
+  filter:blur(1px);
 }
 
 @keyframes rise{
-  0%{transform:translateY(0); opacity:0.6;}
-  100%{transform:translateY(-120vh); opacity:0;}
+  0%{transform:translateY(0);opacity:0.6;}
+  100%{transform:translateY(-120vh);opacity:0;}
 }
 
 /* HEADER */
-.header-wrap{
-  position:fixed;
-  top:0;left:0;right:0;
-  z-index:10;
-}
+.header-wrap{position:fixed;top:0;left:0;right:0;z-index:10;}
 
 .header1{
   background:#B0BFF0;
@@ -57,7 +53,6 @@ body{
   padding:12px;
   font-weight:700;
   font-size:22px;
-  color:#1D1E3C;
 }
 
 .header2{
@@ -70,7 +65,6 @@ body{
 
 .spacer{height:90px;}
 
-/* FILTERS */
 .filters{
   display:flex;
   gap:10px;
@@ -91,23 +85,19 @@ body{
   color:white;
 }
 
-/* SCREEN */
+/* STACK */
 .screen{
   flex:1;
   display:flex;
   justify-content:center;
   align-items:center;
-  z-index:2;
 }
 
-/* STACK */
 .stack{
   width:90vw;
   max-width:420px;
   height:75vh;
-  max-height:700px;
   position:relative;
-  z-index:2;
 }
 
 /* CARD */
@@ -122,48 +112,72 @@ body{
   touch-action:none;
 }
 
-/* IMAGE FULL */
+/* IMAGE */
 .card img{
   width:100%;
   height:100%;
   object-fit:cover;
   position:absolute;
-  top:0;
-  left:0;
 }
 
-/* TEXT OVERLAY */
+/* TEXT */
 .content{
   position:absolute;
   bottom:0;
   width:100%;
   padding:20px;
-  background:linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0));
+  background:linear-gradient(to top, rgba(0,0,0,0.75), transparent);
 }
 
-.content h2{
-  margin:0;
-  color:white;
-  text-shadow:0 2px 6px rgba(0,0,0,0.5);
-}
-
+.content h2,
 .content p{
-  margin-top:5px;
   color:white;
-  text-shadow:0 1px 4px rgba(0,0,0,0.5);
+  margin:0;
 }
 
-/* MATCH */
+/* ❤️ / ❌ LIVE LABEL */
+.badge{
+  position:absolute;
+  top:40px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:32px;
+  font-weight:800;
+  padding:10px 20px;
+  border:3px solid;
+  border-radius:10px;
+  display:none;
+  z-index:5;
+}
+
+.badge.like{
+  color:#2ecc71;
+  border-color:#2ecc71;
+  transform:translateX(-50%) rotate(-15deg);
+}
+
+.badge.nope{
+  color:#e74c3c;
+  border-color:#e74c3c;
+  transform:translateX(-50%) rotate(15deg);
+}
+
+/* MATCH CINÉMA */
 .match{
   display:none;
   text-align:center;
   padding:40px;
-  z-index:3;
+  animation:zoomIn 0.6s ease;
+}
+
+@keyframes zoomIn{
+  from{transform:scale(0.7);opacity:0;}
+  to{transform:scale(1);opacity:1;}
 }
 
 .match h1{
-  font-size:38px;
-  font-weight:800;
+  font-size:42px;
+  font-weight:900;
   color:var(--text-primary);
 }
 
@@ -184,14 +198,12 @@ body{
   padding:10px;
   font-size:12px;
   color:var(--primary);
-  z-index:2;
 }
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
 <div class="header-wrap">
   <div class="header1">Match avec ton emploi</div>
   <div class="header2">France Travail et la route du Rhum</div>
@@ -199,32 +211,26 @@ body{
 
 <div class="spacer"></div>
 
-<!-- FILTERS -->
 <div class="filters">
   <button class="active" onclick="setFilter('all')">Tous</button>
-  <button onclick="setFilter('restauration')">Restauration</button>
   <button onclick="setFilter('industrie')">Industrie</button>
+  <button onclick="setFilter('restauration')">Restauration</button>
   <button onclick="setFilter('alternance')">Alternance</button>
 </div>
 
-<!-- STACK -->
 <div class="screen">
   <div class="stack" id="stack"></div>
 </div>
 
-<!-- MATCH -->
 <div class="match" id="match">
   <div style="font-size:60px">🤝</div>
   <h1 id="matchText"></h1>
 
-  <a href="https://candidat.francetravail.fr/" target="_blank">
-    Se connecter à France Travail
-  </a><br>
+  <a href="https://recrute.francetravail.fr/page-employeur/" target="_blank">
+    Voir la page employeur
+  </a>
 
-  <a id="companyLink" href="#" target="_blank">
-    Voir l’entreprise
-  </a><br><br>
-
+  <br><br>
   <button onclick="restart()">Retour</button>
 </div>
 
@@ -235,38 +241,35 @@ France Travail 2026 | Dites-le nous une fois
 <script>
 
 /* 🎈 BULLES */
-const colors=[
-  "#DBE3FF","#F0E3FA","#FCE5F2","#FAD9D6","#FFF0C7",
-  "#B0BFF0","#D9C9E5","#F0C9DE","#F5A39E",
-  "#406BDE","#69408C","#EB94C2","#EB6366","#FFCC52"
-];
+const colors=["#DBE3FF","#F0E3FA","#FCE5F2","#FAD9D6","#FFF0C7","#406BDE","#EB6366","#FFCC52"];
 
 for(let i=0;i<25;i++){
   const b=document.createElement("div");
   b.className="bubble";
-
   const size=10+Math.random()*70;
   b.style.width=size+"px";
   b.style.height=size+"px";
   b.style.left=Math.random()*100+"vw";
   b.style.background=colors[Math.floor(Math.random()*colors.length)];
   b.style.animationDuration=(6+Math.random()*12)+"s";
-  b.style.animationDelay=(Math.random()*5)+"s";
-
   document.body.appendChild(b);
 }
 
-/* DATA */
 const companies=[
-  {name:"Mytilimer",desc:"Industrie maritime",img:"img/mytilimer.JPG",tag:"industrie",url:"https://www.mytilimer.fr"},
-  {name:"Biscuits Joyeux",desc:"Biscuiterie artisanale",img:"img/biscuits.jpg",tag:"restauration",url:"https://www.biscuits-joyeux.fr"},
-  {name:"Alternance Pro",desc:"Centre de formation",img:"img/alt.jpg",tag:"alternance",url:"https://www.alternance-pro.fr"}
+  {name:"Mytilimer",desc:"Industrie maritime",img:"img/mytilimer.jpg",tag:"industrie",url:"https://recrute.francetravail.fr/page-employeur/"},
+  {name:"Biscuits Joyeux",desc:"Biscuiterie artisanale",img:"img/biscuits.jpg",tag:"restauration",url:"https://recrute.francetravail.fr/page-employeur/"},
+  {name:"Alternance Pro",desc:"Centre formation",img:"img/alt.jpg",tag:"alternance",url:"https://recrute.francetravail.fr/page-employeur/"}
 ];
 
 let filter="all";
 const stack=document.getElementById("stack");
 
-/* RENDER */
+function vibrate(){
+  if(navigator.vibrate){
+    navigator.vibrate(20);
+  }
+}
+
 function render(){
   const list=companies.filter(c=>filter==="all"||c.tag===filter);
   stack.innerHTML="";
@@ -275,13 +278,23 @@ function render(){
 
     const card=document.createElement("div");
     card.className="card";
-    card.style.zIndex=10-i;
+
+    const like=document.createElement("div");
+    like.className="badge like";
+    like.textContent="LIKE";
+
+    const nope=document.createElement("div");
+    nope.className="badge nope";
+    nope.textContent="NOPE";
+
+    card.appendChild(like);
+    card.appendChild(nope);
 
     card.style.transform=`scale(${1-i*0.05}) translateY(${i*10}px)`;
     card.style.opacity=1-i*0.1;
     card.style.filter=`blur(${i*1.5}px)`;
 
-    card.innerHTML=`
+    card.innerHTML+=`
       <img src="${c.img}" onerror="this.src='https://via.placeholder.com/400x600'">
       <div class="content">
         <h2>${c.name}</h2>
@@ -289,7 +302,7 @@ function render(){
       </div>
     `;
 
-    let startX=0, currentX=0, velocity=0, lastX=0, lastT=0, dragging=false;
+    let startX=0,currentX=0,velocity=0,lastX=0,lastT=0,dragging=false;
 
     card.addEventListener("pointerdown",e=>{
       startX=e.clientX;
@@ -301,14 +314,22 @@ function render(){
 
     card.addEventListener("pointermove",e=>{
       if(!dragging) return;
-      e.preventDefault();
 
       currentX=e.clientX-startX;
 
-      const now=Date.now();
-      velocity=(e.clientX-lastX)/(now-lastT);
-      lastX=e.clientX;
-      lastT=now;
+      const likeBadge=card.querySelector(".like");
+      const nopeBadge=card.querySelector(".nope");
+
+      if(currentX>50){
+        likeBadge.style.display="block";
+        nopeBadge.style.display="none";
+      }else if(currentX<-50){
+        nopeBadge.style.display="block";
+        likeBadge.style.display="none";
+      }else{
+        likeBadge.style.display="none";
+        nopeBadge.style.display="none";
+      }
 
       card.style.transform=`translateX(${currentX}px) rotate(${currentX/18}deg)`;
     });
@@ -320,10 +341,12 @@ function render(){
       let finalX=currentX + velocity*150;
 
       if(finalX>120){
+        vibrate();
         card.style.transform="translateX(900px) rotate(30deg)";
         setTimeout(()=>showMatch(c),200);
       }
       else if(finalX<-120){
+        vibrate();
         card.style.transform="translateX(-900px) rotate(-30deg)";
         setTimeout(()=>{
           companies.push(companies.shift());
@@ -331,7 +354,7 @@ function render(){
         },200);
       }
       else{
-        card.style.transition="transform 0.3s ease";
+        card.style.transition="0.3s";
         card.style.transform="translateX(0)";
         setTimeout(()=>card.style.transition="",300);
       }
@@ -346,17 +369,13 @@ function render(){
   });
 }
 
-/* MATCH */
 function showMatch(c){
   document.querySelector(".screen").style.display="none";
   document.querySelector(".filters").style.display="none";
   document.getElementById("match").style.display="block";
-
   document.getElementById("matchText").textContent="Match avec "+c.name;
-  document.getElementById("companyLink").href=c.url;
 }
 
-/* RESET */
 function restart(){
   document.getElementById("match").style.display="none";
   document.querySelector(".screen").style.display="flex";
@@ -364,7 +383,6 @@ function restart(){
   render();
 }
 
-/* FILTER */
 function setFilter(f){
   filter=f;
   document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
