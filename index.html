@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Swipe entreprises Saint-Malo</title>
+  <style>
+    :root{
+      --text-primary:#1D1E3C;
+      --text-secondary:#283276;
+      --primary:#406BDE;
+      --bg:#DBE3FF;
+      --like:#2ecc71;
+      --nope:#e74c3c;
+
+      --b1:#DBE3FF;
+      --b2:#F0E3FA;
+      --b3:#FCE5F2;
+      --b4:#FAD9D6;
+      --b5:#FFF0C7;
+    }
+
+    *{
+      box-sizing:border-box;
+      font-family:"Marianne", Verdana, Tahoma, sans-serif;
+    }
+
+    body{
+      margin:0;
+      background:var(--bg);
+      height:100vh;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+
+    /* HEADER */
+    .header1{
+      background:#B0BFF0;
+      color:#1D1E3C;
+      text-align:center;
+      padding:12px;
+      font-weight:700;
+      font-size:22px;
+      letter-spacing:0.3px;
+      z-index:2;
+    }
+
+    .header2{
+      background:white;
+      color:var(--primary);
+      text-align:center;
+      padding:10px;
+      font-weight:700;
+      font-size:18px;
+      border-bottom:1px solid #eee;
+      z-index:2;
+    }
+
+    /* BUBBLES */
+    .bubble{
+      position:absolute;
+      bottom:-80px;
+      border-radius:50%;
+      opacity:0.55;
+      animation:rise linear infinite;
+      filter:blur(0.2px);
+    }
+
+    @keyframes rise{
+      0%{transform:translateY(0);opacity:0.7;}
+      100%{transform:translateY(-120vh);opacity:0;}
+    }
+
+    /* FILTRES */
+    .filters{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      padding:10px;
+      z-index:2;
+    }
+
+    .filters button{
+      border:none;
+      padding:10px 14px;
+      border-radius:20px;
+      cursor:pointer;
+      background:white;
+      color:var(--text-primary);
+      font-weight:bold;
+    }
+
+    .filters button.active{
+      background:var(--primary);
+      color:white;
+    }
+
+    .screen{
+      flex:1;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      position:relative;
+      z-index:2;
+    }
+
+    .stack{
+      position:relative;
+      width:320px;
+      height:520px;
+    }
+
+    .card{
+      position:absolute;
+      width:100%;
+      height:100%;
+      background:white;
+      border-radius:20px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.2);
+      overflow:hidden;
+      transition:transform 0.3s ease;
+    }
+
+    .card img{
+      width:100%;
+      height:70%;
+      object-fit:cover;
+    }
+
+    .content{
+      padding:15px;
+    }
+
+    h2{margin:0;color:var(--text-primary);}
+    p{color:var(--text-secondary);}
+
+    /* FOOTER */
+    .footer{
+      background:white;
+      text-align:center;
+      padding:10px;
+      font-size:12px;
+      color:var(--primary);
+      border-top:1px solid #eee;
+      z-index:2;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="header1">Match avec ton emploi</div>
+<div class="header2">France Travail et la route du Rhum</div>
+
+<!-- BUBBLES -->
+<script>
+const colors=[
+"#DBE3FF","#F0E3FA","#FCE5F2","#FAD9D6","#FFF0C7",
+"#B0BFF0","#D9C9E5","#F0C9DE","#F5A39E",
+"#406BDE","#69408C","#EB94C2","#EB6366","#FFCC52",
+"#1D1E3C","#283276"
+];
+
+for(let i=0;i<25;i++){
+  let b=document.createElement("div");
+  b.className="bubble";
+
+  const size = 10 + Math.random()*60;
+  b.style.width = size + "px";
+  b.style.height = size + "px";
+
+  b.style.left = Math.random()*100 + "vw";
+  b.style.background = colors[Math.floor(Math.random()*colors.length)];
+
+  b.style.animationDuration = (6 + Math.random()*12) + "s";
+  b.style.animationDelay = (Math.random()*5) + "s";
+
+  document.body.appendChild(b);
+}
+</script>
+
+<!-- FILTRES -->
+<div class="filters">
+  <button class="active" onclick="setFilter('all')">Tous</button>
+  <button onclick="setFilter('restauration')">Restauration</button>
+  <button onclick="setFilter('industrie')">Industrie</button>
+  <button onclick="setFilter('alternance')">Alternance</button>
+</div>
+
+<div class="screen">
+  <div class="stack" id="stack"></div>
+</div>
+
+<div class="footer">France Travail 2026 | Dites-le nous une fois</div>
+
+<script>
+const companies=[
+  {name:"Mytilimer",desc:"Industrie maritime",img:"img/mytilimer.jpg",tag:"industrie"},
+  {name:"Biscuits Joyeux",desc:"Biscuiterie artisanale",img:"img/biscuits.jpg",tag:"restauration"},
+  {name:"Alternance Pro",desc:"Centre de formation",img:"img/alt.jpg",tag:"alternance"}
+];
+
+let filter="all";
+let stack=document.getElementById("stack");
+
+function getFiltered(){
+  return companies.filter(c=>filter==="all"||c.tag===filter);
+}
+
+function render(){
+  const list=getFiltered();
+  stack.innerHTML="";
+
+  list.slice(0,3).reverse().forEach((c,i)=>{
+    let card=document.createElement("div");
+    card.className="card";
+    card.style.zIndex=10-i;
+    card.style.transform=`scale(${1-i*0.05}) translateY(${i*10}px)`;
+
+    card.innerHTML=`
+      <img src="${c.img}" onerror="this.src='https://via.placeholder.com/400x500?text=Image+introuvable'" />
+      <div class="content">
+        <h2>${c.name}</h2>
+        <p>${c.desc}</p>
+      </div>
+    `;
+
+    let startX=0,currentX=0;
+
+    card.addEventListener("pointerdown",e=>startX=e.clientX);
+    card.addEventListener("pointermove",e=>{
+      if(startX===0)return;
+      currentX=e.clientX-startX;
+      card.style.transform=`translateX(${currentX}px) rotate(${currentX/15}deg)`;
+    });
+
+    card.addEventListener("pointerup",()=>{
+      if(currentX>100){card.style.transform="translateX(500px) rotate(20deg)";setTimeout(()=>{companies.push(companies.shift());render();},200);}
+      else if(currentX<-100){card.style.transform="translateX(-500px) rotate(-20deg)";setTimeout(()=>{companies.push(companies.shift());render();},200);}
+      else card.style.transform=`scale(${1-i*0.05}) translateY(${i*10}px)`;
+
+      startX=0;currentX=0;
+    });
+
+    stack.appendChild(card);
+  });
+}
+
+function setFilter(f){
+  filter=f;
+  document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
+  event.target.classList.add("active");
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
