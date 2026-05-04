@@ -112,27 +112,31 @@ body{
   touch-action:none;
 }
 
-/* IMAGE */
+/* image seule */
 .card img{
   width:100%;
   height:100%;
   object-fit:cover;
   position:absolute;
+  top:0;
+  left:0;
 }
 
-/* TEXT */
+/* texte AU-DESSUS du blur */
 .content{
   position:absolute;
   bottom:0;
   width:100%;
   padding:20px;
   background:linear-gradient(to top, rgba(0,0,0,0.75), transparent);
+  z-index:2;
 }
 
 .content h2,
 .content p{
   color:white;
   margin:0;
+  text-shadow:0 2px 8px rgba(0,0,0,0.6);
 }
 
 /* ❤️ / ❌ LIVE LABEL */
@@ -163,33 +167,26 @@ body{
 }
 
 /* MATCH CINÉMA */
-.match{
-  display:none;
-  text-align:center;
-  padding:40px;
-  animation:zoomIn 0.6s ease;
-}
+<div class="match" id="match">
+  <div style="font-size:60px">🤝</div>
+  <h1 id="matchText"></h1>
 
-@keyframes zoomIn{
-  from{transform:scale(0.7);opacity:0;}
-  to{transform:scale(1);opacity:1;}
-}
+  <!-- bouton France Travail -->
+  <a href="https://recrute.francetravail.fr/page-employeur/" target="_blank">
+    Candidater via France Travail
+  </a>
 
-.match h1{
-  font-size:42px;
-  font-weight:900;
-  color:var(--text-primary);
-}
+  <br>
 
-.match a{
-  display:inline-block;
-  margin-top:10px;
-  padding:12px 20px;
-  background:var(--primary);
-  color:white;
-  border-radius:10px;
-  text-decoration:none;
-}
+  <!-- bouton employeur (identique style) -->
+  <a id="companyLink" href="#" target="_blank">
+    Voir le site de l’entreprise
+  </a>
+
+  <br><br>
+
+  <button onclick="restart()">Retour</button>
+</div>
 
 /* FOOTER */
 .footer{
@@ -368,12 +365,15 @@ function render(){
     stack.appendChild(card);
   });
 }
-
-function showMatch(c){
+  function showMatch(c){
   document.querySelector(".screen").style.display="none";
   document.querySelector(".filters").style.display="none";
   document.getElementById("match").style.display="block";
+
   document.getElementById("matchText").textContent="Match avec "+c.name;
+
+  // 👇 même URL pour démo (ou remplace par vraie fiche entreprise)
+  document.getElementById("companyLink").href=c.url;
 }
 
 function restart(){
