@@ -7,7 +7,6 @@
 
 <style>
 :root{
-  --text-primary:#1D1E3C;
   --primary:#406BDE;
   --bg:#DBE3FF;
 }
@@ -45,7 +44,11 @@ body{
 }
 
 /* HEADER */
-.header-wrap{position:fixed;top:0;left:0;right:0;z-index:10;}
+.header-wrap{
+  position:fixed;
+  top:0;left:0;right:0;
+  z-index:10;
+}
 
 .header1{
   background:#B0BFF0;
@@ -53,6 +56,7 @@ body{
   padding:12px;
   font-weight:700;
   font-size:22px;
+  color:#1D1E3C;
 }
 
 .header2{
@@ -85,7 +89,7 @@ body{
   color:white;
 }
 
-/* STACK */
+/* SCREEN */
 .screen{
   flex:1;
   display:flex;
@@ -93,6 +97,7 @@ body{
   align-items:center;
 }
 
+/* STACK */
 .stack{
   width:90vw;
   max-width:420px;
@@ -112,7 +117,7 @@ body{
   touch-action:none;
 }
 
-/* image seule */
+/* IMAGE */
 .card img{
   width:100%;
   height:100%;
@@ -122,7 +127,7 @@ body{
   left:0;
 }
 
-/* texte AU-DESSUS du blur */
+/* TEXT */
 .content{
   position:absolute;
   bottom:0;
@@ -139,15 +144,15 @@ body{
   text-shadow:0 2px 8px rgba(0,0,0,0.6);
 }
 
-/* ❤️ / ❌ LIVE LABEL */
+/* BADGES */
 .badge{
   position:absolute;
   top:40px;
   left:50%;
   transform:translateX(-50%);
-  font-size:32px;
+  font-size:28px;
   font-weight:800;
-  padding:10px 20px;
+  padding:10px 16px;
   border:3px solid;
   border-radius:10px;
   display:none;
@@ -166,27 +171,28 @@ body{
   transform:translateX(-50%) rotate(15deg);
 }
 
-/* MATCH CINÉMA */
-<div class="match" id="match">
-  <div style="font-size:60px">🤝</div>
-  <h1 id="matchText"></h1>
+/* MATCH */
+.match{
+  display:none;
+  text-align:center;
+  padding:40px;
+}
 
-  <!-- bouton France Travail -->
-  <a href="https://recrute.francetravail.fr/page-employeur/" target="_blank">
-    Candidater via France Travail
-  </a>
+.match h1{
+  font-size:38px;
+  font-weight:900;
+  color:#1D1E3C;
+}
 
-  <br>
-
-  <!-- bouton employeur (identique style) -->
-  <a id="companyLink" href="#" target="_blank">
-    Voir le site de l’entreprise
-  </a>
-
-  <br><br>
-
-  <button onclick="restart()">Retour</button>
-</div>
+.match a{
+  display:inline-block;
+  margin-top:10px;
+  padding:12px 20px;
+  background:var(--primary);
+  color:white;
+  border-radius:10px;
+  text-decoration:none;
+}
 
 /* FOOTER */
 .footer{
@@ -224,10 +230,17 @@ body{
   <h1 id="matchText"></h1>
 
   <a href="https://recrute.francetravail.fr/page-employeur/" target="_blank">
-    Voir la page employeur
+    Candidater via France Travail
+  </a>
+
+  <br>
+
+  <a id="companyLink" href="#" target="_blank">
+    Voir le site de l’entreprise
   </a>
 
   <br><br>
+
   <button onclick="restart()">Retour</button>
 </div>
 
@@ -243,15 +256,18 @@ const colors=["#DBE3FF","#F0E3FA","#FCE5F2","#FAD9D6","#FFF0C7","#406BDE","#EB63
 for(let i=0;i<25;i++){
   const b=document.createElement("div");
   b.className="bubble";
+
   const size=10+Math.random()*70;
   b.style.width=size+"px";
   b.style.height=size+"px";
   b.style.left=Math.random()*100+"vw";
   b.style.background=colors[Math.floor(Math.random()*colors.length)];
   b.style.animationDuration=(6+Math.random()*12)+"s";
+
   document.body.appendChild(b);
 }
 
+/* DATA */
 const companies=[
   {name:"Mytilimer",desc:"Industrie maritime",img:"img/mytilimer.jpg",tag:"industrie",url:"https://recrute.francetravail.fr/page-employeur/"},
   {name:"Biscuits Joyeux",desc:"Biscuiterie artisanale",img:"img/biscuits.jpg",tag:"restauration",url:"https://recrute.francetravail.fr/page-employeur/"},
@@ -262,11 +278,10 @@ let filter="all";
 const stack=document.getElementById("stack");
 
 function vibrate(){
-  if(navigator.vibrate){
-    navigator.vibrate(20);
-  }
+  if(navigator.vibrate) navigator.vibrate(20);
 }
 
+/* RENDER */
 function render(){
   const list=companies.filter(c=>filter==="all"||c.tag===filter);
   stack.innerHTML="";
@@ -278,11 +293,11 @@ function render(){
 
     const like=document.createElement("div");
     like.className="badge like";
-    like.textContent="LIKE";
+    like.textContent="AIME";
 
     const nope=document.createElement("div");
     nope.className="badge nope";
-    nope.textContent="NOPE";
+    nope.textContent="PAS POUR MOI";
 
     card.appendChild(like);
     card.appendChild(nope);
@@ -365,14 +380,14 @@ function render(){
     stack.appendChild(card);
   });
 }
-  function showMatch(c){
+
+/* MATCH */
+function showMatch(c){
   document.querySelector(".screen").style.display="none";
   document.querySelector(".filters").style.display="none";
   document.getElementById("match").style.display="block";
 
   document.getElementById("matchText").textContent="Match avec "+c.name;
-
-  // 👇 même URL pour démo (ou remplace par vraie fiche entreprise)
   document.getElementById("companyLink").href=c.url;
 }
 
