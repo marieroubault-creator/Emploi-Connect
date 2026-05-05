@@ -238,7 +238,7 @@ for(let i=0;i<20;i++){
 let data = {};
 let filter = "all";
 
-/* INIT SAFE */
+/* INIT */
 window.addEventListener("DOMContentLoaded", () => {
   loadData();
 });
@@ -260,11 +260,11 @@ async function loadData(){
 
       const cols = rows[i].split(",");
 
-      const c = cols[0];
-      const n = cols[1];
-      const d = cols[2];
-      const img = cols[3];
-      const url = cols[4];
+      const c = cols[0]?.trim();
+      const n = cols[1]?.trim();
+      const d = cols[2]?.trim();
+      const img = cols[3]?.trim();
+      const url = cols[4]?.trim();
 
       if(!c || !n) continue;
 
@@ -273,13 +273,35 @@ async function loadData(){
       data[c].push({name:n,desc:d,img,url});
     }
 
-    console.log("DATA OK", data);
-
+    buildFilters();   // 👈 AJOUT ICI
     render();
 
   } catch(e){
     console.error("Sheet error", e);
   }
+}
+
+/* 👉 CRÉATION AUTOMATIQUE DES CATÉGORIES */
+function buildFilters(){
+
+  const container = document.getElementById("filters");
+  if(!container) return;
+
+  container.innerHTML = `<button class="active" onclick="setFilter('all')">Tous</button>`;
+
+  Object.keys(data).forEach(cat => {
+
+    const btn = document.createElement("button");
+    btn.textContent = cat;
+
+    btn.onclick = (e) => {
+      setFilter(cat);
+      document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
+      e.target.classList.add("active");
+    };
+
+    container.appendChild(btn);
+  });
 }
 
 /* RENDER */
