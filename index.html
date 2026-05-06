@@ -106,7 +106,6 @@ html, body{
   touch-action:none;
 }
 
-/* IMAGE */
 .card img{
   width:100%;
   height:100%;
@@ -114,7 +113,6 @@ html, body{
   background:#fff;
 }
 
-/* CONTENT */
 .content{
   position:absolute;
   bottom:0;
@@ -129,7 +127,6 @@ html, body{
   margin:0;
 }
 
-/* BUTTONS */
 .actions{
   display:flex;
   gap:20px;
@@ -148,13 +145,18 @@ html, body{
 .like{background:#2ecc71;}
 
 /* ===================== */
-/* MATCH RESPONSIVE FIX */
+/* 🔥 MATCH FIX TABLETTE  */
 /* ===================== */
 
 .match{
   display:none;
   position:fixed;
   inset:0;
+
+  width:100%;
+  height:100dvh; /* ⭐ IMPORTANT TABLETTE */
+  height:100vh;
+
   background:rgba(255,255,255,0.92);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -164,12 +166,12 @@ html, body{
 
   z-index:999;
 
-  padding:20px;
+  padding:16px;
 
   opacity:0;
   transition:opacity 0.35s ease;
 
-  overflow:auto;
+  overflow:hidden; /* ⭐ évite dézoom nécessaire */
 }
 
 .match.show{
@@ -177,22 +179,24 @@ html, body{
   opacity:1;
 }
 
-/* ⭐ FIX IMPORTANT TABLET / ÉCRAN CENTRÉ PROPRE */
+/* ⭐ BLOQUE TAILLE VISIBLE (clé du fix) */
 .match-inner{
   width:min(92vw, 420px);
-  max-height:min(85vh, 700px);
+  max-height:calc(100dvh - 40px);
 
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:16px;
+  gap:14px;
 
-  padding:20px;
+  padding:18px;
 
   background:white;
   border-radius:24px;
   box-shadow:0 20px 60px rgba(0,0,0,0.2);
+
+  overflow:auto; /* ⭐ empêche débordement tablette */
 }
 
 /* FLASH */
@@ -218,15 +222,12 @@ html, body{
   100%{transform:scale(1);}
 }
 
-/* TITRE RESPONSIVE */
 #matchText{
   font-size:clamp(22px, 5vw, 42px);
   font-weight:800;
   color:#1d1e3c;
-  text-align:center;
 }
 
-/* BOUTONS MATCH */
 .match a{
   width:100%;
   max-width:280px;
@@ -238,17 +239,12 @@ html, body{
   text-align:center;
 }
 
-.ft-btn{
-  background:#406BDE;
-  color:white;
-}
-
+.ft-btn,
 .company-btn{
   background:#406BDE;
   color:white;
 }
 
-/* bouton retour */
 .match button{
   margin-top:10px;
   padding:10px 16px;
@@ -283,14 +279,11 @@ html, body{
 </div>
 
 <div class="match" id="match">
-  <div class="match-inner">
-    <h1 id="matchText"></h1>
-    <button onclick="restart()">Continuer</button>
-  </div>
+  <h1 id="matchText"></h1>
+  <button onclick="restart()">Continuer</button>
 </div>
 
 <script>
-
 let data = {};
 let currentList = [];
 let currentIndex = 0;
