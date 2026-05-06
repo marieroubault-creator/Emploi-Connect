@@ -147,18 +147,14 @@ html, body{
 .nope{background:#e74c3c;}
 .like{background:#2ecc71;}
 
-/* MATCH */
+/* ===================== */
+/* MATCH RESPONSIVE FIX */
+/* ===================== */
+
 .match{
   display:none;
   position:fixed;
   inset:0;
-
-  min-height:100dvh;
-  min-height:100vh;
-
-  width:100%;
-  height:100%;
-
   background:rgba(255,255,255,0.92);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -166,26 +162,25 @@ html, body{
   justify-content:center;
   align-items:center;
 
-  text-align:center;
   z-index:999;
 
   padding:20px;
 
-  transform:scale(0.92);
   opacity:0;
-  transition:all 0.35s ease;
+  transition:opacity 0.35s ease;
+
+  overflow:auto;
 }
 
 .match.show{
   display:flex;
-  transform:scale(1);
   opacity:1;
 }
 
-/* ⭐ AJOUT IMPORTANT : CONTAINER INTERNE RESPONSIVE */
+/* ⭐ FIX IMPORTANT TABLET / ÉCRAN CENTRÉ PROPRE */
 .match-inner{
   width:min(92vw, 420px);
-  max-height:85vh;
+  max-height:min(85vh, 700px);
 
   display:flex;
   flex-direction:column;
@@ -193,7 +188,11 @@ html, body{
   justify-content:center;
   gap:16px;
 
-  padding:10px;
+  padding:20px;
+
+  background:white;
+  border-radius:24px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.2);
 }
 
 /* FLASH */
@@ -224,6 +223,7 @@ html, body{
   font-size:clamp(22px, 5vw, 42px);
   font-weight:800;
   color:#1d1e3c;
+  text-align:center;
 }
 
 /* BOUTONS MATCH */
@@ -238,7 +238,6 @@ html, body{
   text-align:center;
 }
 
-/* BLEU FRANCE TRAVAIL */
 .ft-btn{
   background:#406BDE;
   color:white;
@@ -259,6 +258,7 @@ html, body{
   color:white;
   font-weight:700;
 }
+
 </style>
 </head>
 
@@ -283,8 +283,10 @@ html, body{
 </div>
 
 <div class="match" id="match">
-  <h1 id="matchText"></h1>
-  <button onclick="restart()">Continuer</button>
+  <div class="match-inner">
+    <h1 id="matchText"></h1>
+    <button onclick="restart()">Continuer</button>
+  </div>
 </div>
 
 <script>
@@ -446,7 +448,6 @@ function showMatch(c){
 
   m.innerHTML=`
     <div class="match-inner">
-
       <div class="handshake">🤝</div>
 
       <h1 id="matchText">MATCH avec ${c.name}</h1>
@@ -460,7 +461,6 @@ function showMatch(c){
       </a>
 
       <button onclick="restart()">Continuer</button>
-
     </div>
   `;
 
