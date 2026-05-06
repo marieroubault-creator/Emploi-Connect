@@ -84,7 +84,12 @@ body{
 .stack{
   width:92vw;
   max-width:420px;
-  height:72vh;
+
+  /* ⭐ FIX IMPORTANT TABLETTE */
+  height:auto;
+  aspect-ratio: 3/4;
+  max-height:70vh;
+
   position:relative;
 }
 
@@ -98,12 +103,17 @@ body{
   background:white;
   box-shadow:0 12px 30px rgba(0,0,0,0.22);
   touch-action:none;
+
+  display:flex;
+  flex-direction:column;
 }
 
+/* IMAGE ⭐ FIX RESPONSIVE */
 .card img{
   width:100%;
   height:100%;
-  object-fit:cover;
+  object-fit:contain; /* important */
+  background:#fff;
 }
 
 /* CONTENT */
@@ -139,32 +149,38 @@ body{
 .nope{background:#e74c3c;}
 .like{background:#2ecc71;}
 
-/* MATCH */
+/* ===================== */
+/* ⭐ MATCH RESPONSIVE FIX */
+/* ===================== */
+
 .match{
   display:none;
   position:fixed;
   inset:0;
+
+  /* centre parfait tablette */
+  align-items:center;
+  justify-content:center;
+
   background:rgba(255,255,255,0.92);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 
-  justify-content:center;
-  align-items:center;
   flex-direction:column;
-  gap:18px;
+  gap:16px;
 
   text-align:center;
   z-index:999;
 
   padding:20px;
 
+  /* ⭐ FIX IMPORTANT */
+  min-height:100dvh;
+  overflow:hidden;
+
   transform:scale(0.9);
   opacity:0;
   transition:all 0.35s ease;
-
-  /* ⭐ FIX RESPONSIVE */
-  max-height:100vh;
-  overflow:auto;
 }
 
 .match.show{
@@ -198,10 +214,9 @@ body{
 
 /* TITRE RESPONSIVE */
 #matchText{
-  font-size:clamp(24px, 5vw, 42px);
+  font-size:clamp(22px, 5vw, 42px);
   font-weight:800;
   color:#1d1e3c;
-  margin:10px 0;
 }
 
 /* BOUTONS MATCH */
@@ -227,14 +242,13 @@ body{
   color:white;
 }
 
-/* 🔥 bouton retour VIOLET FRANCE TRAVAIL */
+/* bouton retour */
 .match button{
   margin-top:10px;
   padding:10px 16px;
   border:none;
   border-radius:10px;
-
-  background:#6C63FF; /* violet FT */
+  background:#6C63FF;
   color:white;
   font-weight:700;
 }
