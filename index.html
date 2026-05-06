@@ -153,6 +153,28 @@ body{
 }
 
 .match.show{display:flex;}
+  .overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:42px;
+  font-weight:800;
+  opacity:0;
+  transition:0.2s ease;
+  z-index:5;
+}
+
+.overlay.like{
+  background:rgba(46, 204, 113, 0.25);
+  color:#2ecc71;
+}
+
+.overlay.nope{
+  background:rgba(231, 76, 60, 0.25);
+  color:#e74c3c;
+}
 </style>
 </head>
 
