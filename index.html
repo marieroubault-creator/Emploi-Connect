@@ -302,12 +302,15 @@ function render(){
   card.className="card";
 
   card.innerHTML=`
-    <img src="${c.img}">
-    <div class="content">
-      <h2>${c.name}</h2>
-      <p>${c.desc}</p>
-    </div>
-  `;
+  <div class="overlay like">❤️ LIKE</div>
+  <div class="overlay nope">❌ NOPE</div>
+
+  <img src="${c.img}">
+  <div class="content">
+    <h2>${c.name}</h2>
+    <p>${c.desc}</p>
+  </div>
+`;
 
   let startX = 0;
   let dragging = false;
@@ -320,12 +323,28 @@ function render(){
     card.style.transition = "none";
   });
 
-  card.addEventListener("pointermove", e=>{
-    if(!dragging) return;
+card.addEventListener("pointermove", e=>{
+  if(!dragging) return;
 
-    let diff = e.clientX - startX;
-    card.style.transform = `translateX(${diff}px) rotate(${diff/12}deg)`;
-  });
+  let diff = e.clientX - startX;
+  card.style.transform = `translateX(${diff}px) rotate(${diff/12}deg)`;
+
+  const like = card.querySelector(".like");
+  const nope = card.querySelector(".nope");
+
+  if(diff > 40){
+    like.style.opacity = Math.min(diff / 150, 1);
+    nope.style.opacity = 0;
+  }
+  else if(diff < -40){
+    nope.style.opacity = Math.min(Math.abs(diff) / 150, 1);
+    like.style.opacity = 0;
+  }
+  else{
+    like.style.opacity = 0;
+    nope.style.opacity = 0;
+  }
+});
 
   card.addEventListener("pointerup", e=>{
     if(!dragging) return;
