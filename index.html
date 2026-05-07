@@ -145,7 +145,7 @@ html, body{
 .like{background:#2ecc71;}
 
 /* ===================== */
-/* 🔥 MATCH FIX TABLETTE  */
+/* MATCH — SANS OVERLAY  */
 /* ===================== */
 
 .match{
@@ -153,50 +153,23 @@ html, body{
   position:fixed;
   inset:0;
 
-  width:100%;
-  height:100%;           /* ✅ FIX : plus de conflit dvh/vh */
-  min-height:100dvh;     /* ✅ FIX : dvh pour les navigateurs mobiles modernes */
-
-  background:rgba(255,255,255,0.92);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background:#DBE3FF;
 
   justify-content:center;
   align-items:center;
+  flex-direction:column;
+  gap:16px;
 
   z-index:999;
-
-  padding:16px;
+  padding:24px;
 
   opacity:0;
   transition:opacity 0.35s ease;
-
-  overflow:auto;         /* ✅ FIX : auto au lieu de hidden = plus de dézoom forcé */
 }
 
 .match.show{
   display:flex;
   opacity:1;
-}
-
-/* ✅ FIX TABLETTE */
-.match-inner{
-  width:min(92vw, 420px);
-  max-height: min(90dvh, 90vh);   /* ✅ FIX : prend la plus petite des deux valeurs */
-
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:10px;                        /* ✅ FIX : réduit de 14 à 10 */
-
-  padding: clamp(12px, 3vw, 22px); /* ✅ FIX : s'adapte à la taille d'écran */
-
-  background:white;
-  border-radius:24px;
-  box-shadow:0 20px 60px rgba(0,0,0,0.2);
-
-  overflow-y:auto;       /* ✅ FIX : scroll interne si contenu trop grand */
 }
 
 /* FLASH */
@@ -205,14 +178,14 @@ html, body{
 }
 
 @keyframes flash{
-  0%{background:rgba(255,255,255,1);}
-  50%{background:rgba(64,107,222,0.15);}
-  100%{background:rgba(255,255,255,0.92);}
+  0%{background:#ffffff;}
+  50%{background:#c7d2ff;}
+  100%{background:#DBE3FF;}
 }
 
 /* HANDSHAKE */
 .handshake{
-  font-size: clamp(50px, 10vw, 80px); /* ✅ FIX : réduit sur petits écrans */
+  font-size:clamp(50px, 12vw, 90px);
   animation:pop 0.6s ease;
 }
 
@@ -226,11 +199,13 @@ html, body{
   font-size:clamp(22px, 5vw, 42px);
   font-weight:800;
   color:#1d1e3c;
+  text-align:center;
+  margin:0;
 }
 
 .match a{
   width:100%;
-  max-width:280px;
+  max-width:300px;
   padding:14px 18px;
   border-radius:14px;
   text-decoration:none;
@@ -246,13 +221,14 @@ html, body{
 }
 
 .match button{
-  margin-top:10px;
+  margin-top:4px;
   padding:10px 16px;
   border:none;
   border-radius:10px;
   background:#6C63FF;
   color:white;
   font-weight:700;
+  cursor:pointer;
 }
 
 </style>
@@ -278,10 +254,7 @@ html, body{
   </div>
 </div>
 
-<div class="match" id="match">
-  <h1 id="matchText"></h1>
-  <button onclick="restart()">Continuer</button>
-</div>
+<div class="match" id="match"></div>
 
 <script>
 let data = {};
@@ -440,21 +413,19 @@ function showMatch(c){
   const m=document.getElementById("match");
 
   m.innerHTML=`
-    <div class="match-inner">
-      <div class="handshake">🤝</div>
+    <div class="handshake">🤝</div>
 
-      <h1 id="matchText">MATCH avec ${c.name}</h1>
+    <h1 id="matchText">MATCH avec ${c.name} !</h1>
 
-      <a class="ft-btn" href="https://recrute.francetravail.fr/page-employeur/" target="_blank">
-        Offres France Travail
-      </a>
+    <a class="ft-btn" href="https://recrute.francetravail.fr/page-employeur/" target="_blank">
+      Offres France Travail
+    </a>
 
-      <a class="company-btn" href="${c.url||"#"}" target="_blank">
-        Site de l'entreprise
-      </a>
+    <a class="company-btn" href="${c.url||"#"}" target="_blank">
+      Site de l'entreprise
+    </a>
 
-      <button onclick="restart()">Continuer</button>
-    </div>
+    <button onclick="restart()">Continuer</button>
   `;
 
   m.classList.add("show","flash");
