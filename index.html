@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Match avec ton emploi</title>
 
 <style>
@@ -145,31 +145,32 @@ html, body{
 .like{background:#2ecc71;}
 
 /* ===================== */
-/* MATCH — SANS OVERLAY  */
+/* MATCH                 */
 /* ===================== */
 
 .match{
   display:none;
   position:fixed;
-  inset:0;
+  top:0; left:0;
+  width:100vw;
+  height:100vh;
 
   background:#DBE3FF;
 
+  flex-direction:column;
   justify-content:center;
   align-items:center;
-  flex-direction:column;
-  gap:16px;
+  gap:14px;
 
   z-index:999;
-  padding:24px;
+  padding:20px;
 
-  opacity:0;
-  transition:opacity 0.35s ease;
+  /* Clé du fix : rien ne peut déborder */
+  overflow:hidden;
 }
 
 .match.show{
   display:flex;
-  opacity:1;
 }
 
 /* FLASH */
@@ -185,8 +186,9 @@ html, body{
 
 /* HANDSHAKE */
 .handshake{
-  font-size:clamp(50px, 12vw, 90px);
+  font-size:clamp(40px, 8vh, 80px);
   animation:pop 0.6s ease;
+  line-height:1;
 }
 
 @keyframes pop{
@@ -196,22 +198,25 @@ html, body{
 }
 
 #matchText{
-  font-size:clamp(22px, 5vw, 42px);
+  font-size:clamp(18px, 4vh, 36px);
   font-weight:800;
   color:#1d1e3c;
   text-align:center;
   margin:0;
+  /* Empêche le texte de forcer un élargissement */
+  max-width:90vw;
+  word-break:break-word;
 }
 
 .match a{
-  width:100%;
-  max-width:300px;
-  padding:14px 18px;
+  width:min(90vw, 300px);
+  padding:clamp(10px, 2vh, 14px) 18px;
   border-radius:14px;
   text-decoration:none;
   font-weight:700;
   display:block;
   text-align:center;
+  font-size:clamp(14px, 2vh, 16px);
 }
 
 .ft-btn,
@@ -221,14 +226,14 @@ html, body{
 }
 
 .match button{
-  margin-top:4px;
-  padding:10px 16px;
+  padding:clamp(8px, 1.5vh, 12px) 16px;
   border:none;
   border-radius:10px;
   background:#6C63FF;
   color:white;
   font-weight:700;
   cursor:pointer;
+  font-size:clamp(13px, 2vh, 16px);
 }
 
 </style>
@@ -264,23 +269,13 @@ let currentIndex = 0;
 async function loadData(){
   const res = await fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vSM_YU-q5RRw9vsihxuJaZ-kStFXupQ9bt_dcBXy3-rkIKQj297iAQXyJ_6DcuFkw4XEDRkyZhfEH7a/pub?output=csv");
   const text = await res.text();
-
   const rows = text.split("\n").slice(1);
-
   rows.forEach(r=>{
     const c = r.split(",");
     if(!c[0]) return;
-
     if(!data[c[0]]) data[c[0]]=[];
-
-    data[c[0]].push({
-      name:c[1],
-      desc:c[2],
-      img:c[3],
-      url:c[4]
-    });
+    data[c[0]].push({ name:c[1], desc:c[2], img:c[3], url:c[4] });
   });
-
   buildFilters();
   setFilter("all");
 }
@@ -288,44 +283,27 @@ async function loadData(){
 function buildFilters(){
   const container = document.getElementById("filters");
   container.innerHTML = "";
-
   const allBtn = document.createElement("button");
   allBtn.textContent = "Tous";
   allBtn.classList.add("active");
-
-  allBtn.onclick = (e)=>{
-    setFilter("all");
-    setActive(e.target);
-  };
-
+  allBtn.onclick = (e)=>{ setFilter("all"); setActive(e.target); };
   function setActive(btn){
-    document.querySelectorAll(".filters button")
-      .forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
   }
-
   container.appendChild(allBtn);
-
   Object.keys(data).forEach(cat=>{
     const btn=document.createElement("button");
     btn.textContent=cat;
-    btn.onclick=(e)=>{
-      setFilter(cat);
-      setActive(e.target);
-    };
+    btn.onclick=(e)=>{ setFilter(cat); setActive(e.target); };
     container.appendChild(btn);
   });
 }
 
 function setFilter(cat){
   currentList = [];
-
-  if(cat==="all"){
-    Object.values(data).forEach(a=>currentList=currentList.concat(a));
-  }else{
-    currentList=data[cat];
-  }
-
+  if(cat==="all"){ Object.values(data).forEach(a=>currentList=currentList.concat(a)); }
+  else { currentList=data[cat]; }
   currentIndex=0;
   render();
 }
@@ -333,108 +311,45 @@ function setFilter(cat){
 function render(){
   const stack=document.getElementById("stack");
   stack.innerHTML="";
-
-  if(currentIndex>=currentList.length){
-    stack.innerHTML="<p>Plus de cartes</p>";
-    return;
-  }
-
+  if(currentIndex>=currentList.length){ stack.innerHTML="<p>Plus de cartes</p>"; return; }
   const c=currentList[currentIndex];
-
   const card=document.createElement("div");
   card.className="card";
-
-  card.innerHTML=`
-  <img src="${c.img}">
-  <div class="content">
-    <h2>${c.name}</h2>
-    <p>${c.desc}</p>
-  </div>
-`;
-
-  let startX=0;
-  let dragging=false;
-
-  card.addEventListener("pointerdown",e=>{
-    startX=e.clientX;
-    dragging=true;
-    card.setPointerCapture(e.pointerId);
-    card.style.transition="none";
-  });
-
-  card.addEventListener("pointermove",e=>{
-    if(!dragging) return;
-    let diff=e.clientX-startX;
-    card.style.transform=`translateX(${diff}px) rotate(${diff/12}deg)`;
-  });
-
-  card.addEventListener("pointerup",e=>{
-    dragging=false;
-    let diff=e.clientX-startX;
-    card.style.transition="0.3s ease";
-
-    if(diff>100) swipe("right");
-    else if(diff<-100) swipe("left");
-    else card.style.transform="translateX(0)";
-  });
-
+  card.innerHTML=`<img src="${c.img}"><div class="content"><h2>${c.name}</h2><p>${c.desc}</p></div>`;
+  let startX=0, dragging=false;
+  card.addEventListener("pointerdown",e=>{ startX=e.clientX; dragging=true; card.setPointerCapture(e.pointerId); card.style.transition="none"; });
+  card.addEventListener("pointermove",e=>{ if(!dragging) return; let diff=e.clientX-startX; card.style.transform=`translateX(${diff}px) rotate(${diff/12}deg)`; });
+  card.addEventListener("pointerup",e=>{ dragging=false; let diff=e.clientX-startX; card.style.transition="0.3s ease"; if(diff>100) swipe("right"); else if(diff<-100) swipe("left"); else card.style.transform="translateX(0)"; });
   stack.appendChild(card);
 }
 
 function swipe(dir){
   const card=document.querySelector(".card");
   if(!card) return;
-
   const c=currentList[currentIndex];
-
   card.style.transition="0.3s ease";
-
-  card.style.transform = dir==="right"
-    ? "translateX(1200px) rotate(20deg)"
-    : "translateX(-1200px) rotate(-20deg)";
-
+  card.style.transform = dir==="right" ? "translateX(1200px) rotate(20deg)" : "translateX(-1200px) rotate(-20deg)";
   currentIndex++;
-
-  setTimeout(()=>{
-    if(dir==="right") showMatch(c);
-    else render();
-  },300);
+  setTimeout(()=>{ if(dir==="right") showMatch(c); else render(); },300);
 }
 
 function showMatch(c){
-
   const audio = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3");
   audio.play();
-
-  if(navigator.vibrate){
-    navigator.vibrate([200,100,200]);
-  }
-
+  if(navigator.vibrate){ navigator.vibrate([200,100,200]); }
   const m=document.getElementById("match");
-
   m.innerHTML=`
     <div class="handshake">🤝</div>
-
     <h1 id="matchText">MATCH avec ${c.name} !</h1>
-
-    <a class="ft-btn" href="https://recrute.francetravail.fr/page-employeur/" target="_blank">
-      Offres France Travail
-    </a>
-
-    <a class="company-btn" href="${c.url||"#"}" target="_blank">
-      Site de l'entreprise
-    </a>
-
+    <a class="ft-btn" href="https://recrute.francetravail.fr/page-employeur/" target="_blank">Offres France Travail</a>
+    <a class="company-btn" href="${c.url||"#"}" target="_blank">Site de l'entreprise</a>
     <button onclick="restart()">Continuer</button>
   `;
-
   m.classList.add("show","flash");
   setTimeout(()=>m.classList.remove("flash"),700);
 }
 
-function forceSwipe(dir){
-  swipe(dir);
-}
+function forceSwipe(dir){ swipe(dir); }
 
 function restart(){
   document.getElementById("match").classList.remove("show");
@@ -442,7 +357,6 @@ function restart(){
 }
 
 loadData();
-
 </script>
 </body>
 </html>
