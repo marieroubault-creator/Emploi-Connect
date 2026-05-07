@@ -154,8 +154,8 @@ html, body{
   inset:0;
 
   width:100%;
-  height:100dvh; /* ⭐ IMPORTANT TABLETTE */
-  height:100vh;
+  height:100%;           /* ✅ FIX : plus de conflit dvh/vh */
+  min-height:100dvh;     /* ✅ FIX : dvh pour les navigateurs mobiles modernes */
 
   background:rgba(255,255,255,0.92);
   backdrop-filter: blur(14px);
@@ -171,7 +171,7 @@ html, body{
   opacity:0;
   transition:opacity 0.35s ease;
 
-  overflow:hidden; /* ⭐ évite dézoom nécessaire */
+  overflow:auto;         /* ✅ FIX : auto au lieu de hidden = plus de dézoom forcé */
 }
 
 .match.show{
@@ -179,24 +179,24 @@ html, body{
   opacity:1;
 }
 
-/* ⭐ BLOQUE TAILLE VISIBLE (clé du fix) */
+/* ✅ FIX TABLETTE */
 .match-inner{
   width:min(92vw, 420px);
-  max-height:calc(100dvh - 40px);
+  max-height: min(90dvh, 90vh);   /* ✅ FIX : prend la plus petite des deux valeurs */
 
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:14px;
+  gap:10px;                        /* ✅ FIX : réduit de 14 à 10 */
 
-  padding:18px;
+  padding: clamp(12px, 3vw, 22px); /* ✅ FIX : s'adapte à la taille d'écran */
 
   background:white;
   border-radius:24px;
   box-shadow:0 20px 60px rgba(0,0,0,0.2);
 
-  overflow:auto; /* ⭐ empêche débordement tablette */
+  overflow-y:auto;       /* ✅ FIX : scroll interne si contenu trop grand */
 }
 
 /* FLASH */
@@ -212,7 +212,7 @@ html, body{
 
 /* HANDSHAKE */
 .handshake{
-  font-size:90px;
+  font-size: clamp(50px, 10vw, 80px); /* ✅ FIX : réduit sur petits écrans */
   animation:pop 0.6s ease;
 }
 
