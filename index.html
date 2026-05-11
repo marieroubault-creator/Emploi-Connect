@@ -355,7 +355,8 @@ function setFilter(cat){
 function render(){
   const stack=document.getElementById("stack");
   stack.innerHTML="";
-  if(currentIndex>=currentList.length){ stack.innerHTML="<p>Plus de cartes</p>"; return; }
+  if(currentIndex>=currentList.length){ currentIndex=0; }
+  if(!currentList.length){ stack.innerHTML="<p>Plus de cartes</p>"; return; }
   const c=currentList[currentIndex];
   const card=document.createElement("div");
   card.className="card";
