@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Match avec ton emploi</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --primary:#FF6B6B;
+  --secondary:#FFE66D;
+  --accent:#4ECDC4;
+  --purple:#A855F7;
+  --bg1:#1a1a2e;
+  --bg2:#16213e;
+  --bg3:#0f3460;
+  --card-bg:#ffffff;
+  --nope:#FF6B6B;
+  --like:#4ECDC4;
+}
+
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  background:var(--bg1);
+  min-height:100vh;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  overflow-x:hidden;
+  font-family:'Nunito', sans-serif;
+  cursor:default;
+}
+
+/* ======= ANIMATED BACKGROUND ======= */
+.bg-canvas{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  overflow:hidden;
+}
+
+.wave{
+  position:absolute;
+  bottom:0;
+  left:-10%;
+  width:120%;
+  height:220px;
+  border-radius:50% 50% 0 0;
+  opacity:0.18;
+  animation:waveAnim 6s ease-in-out infinite;
+}
+.wave:nth-child(1){ background:#4ECDC4; animation-delay:0s; bottom:-40px; }
+.wave:nth-child(2){ background:#A855F7; animation-delay:2s; bottom:-60px; height:180px; opacity:0.13; }
+.wave:nth-child(3){ background:#FF6B6B; animation-delay:4s; bottom:-80px; height:150px; opacity:0.10; }
+
+@keyframes waveAnim{
+  0%,100%{ transform:translateX(0) scaleY(1); }
+  50%{ transform:translateX(3%) scaleY(1.08); }
+}
+
+/* stars */
+.star{
+  position:absolute;
+  border-radius:50%;
+  background:white;
+  animation:twinkle 3s ease-in-out infinite;
+  opacity:0;
+}
+@keyframes twinkle{
+  0%,100%{opacity:0; transform:scale(0.8);}
+  50%{opacity:0.7; transform:scale(1.2);}
+}
+
+/* ======= HEADER ======= */
+.header-wrap{
+  position:fixed;
+  top:0; left:0; right:0;
+  z-index:10;
+}
+
+.header1{
+  background:linear-gradient(135deg, #FF6B6B, #FF8E53);
+  text-align:center;
+  padding:12px 14px;
+  font-family:'Fredoka One', cursive;
+  font-size:24px;
+  color:white;
+  letter-spacing:1px;
+  text-shadow: 0 3px 0 rgba(0,0,0,0.25);
+  box-shadow:0 4px 0 rgba(0,0,0,0.2);
+  position:relative;
+}
+.header1::after{
+  content:'🕹️';
+  position:absolute;
+  right:14px; top:50%;
+  transform:translateY(-50%);
+  font-size:22px;
+}
+
+.header2{
+  background:rgba(255,255,255,0.12);
+  backdrop-filter:blur(8px);
+  text-align:center;
+  padding:10px;
+  font-weight:800;
+  color:#FFE66D;
+  font-size:13px;
+  letter-spacing:0.5px;
+  text-shadow:0 1px 4px rgba(0,0,0,0.5);
+  border-bottom:2px solid rgba(255,255,255,0.1);
+}
+
+.spacer{ height:100px; }
+
+/* ======= FILTERS ======= */
+.filters{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:10px 16px;
+  scrollbar-width:none;
+  position:relative;
+  z-index:1;
+}
+.filters::-webkit-scrollbar{ display:none; }
+
+.filters button{
+  border:3px solid rgba(255,255,255,0.15);
+  padding:7px 16px;
+  border-radius:50px;
+  background:rgba(255,255,255,0.08);
+  font-weight:800;
+  color:rgba(255,255,255,0.7);
+  cursor:pointer;
+  font-family:'Nunito',sans-serif;
+  white-space:nowrap;
+  transition:all 0.2s ease;
+  font-size:13px;
+}
+.filters button:hover{ transform:scale(1.05); background:rgba(255,255,255,0.15); }
+.filters button.active{
+  background:linear-gradient(135deg,#FF6B6B,#FF8E53);
+  border-color:#FF6B6B;
+  color:white;
+  box-shadow:0 4px 15px rgba(255,107,107,0.5);
+  transform:scale(1.05);
+}
+
+/* ======= INTRO ======= */
+.intro-text{
+  text-align:center;
+  padding:8px 24px 12px;
+  font-size:14px;
+  color:rgba(255,255,255,0.75);
+  font-weight:700;
+  max-width:380px;
+  margin:0 auto;
+  position:relative;
+  z-index:1;
+}
+
+/* ======= SCREEN ======= */
+.screen{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+  position:relative;
+  z-index:1;
+  padding:10px 0 20px;
+}
+
+/* ======= STACK ======= */
+.stack{
+  width:88vw;
+  max-width:380px;
+  aspect-ratio:3/4;
+  max-height:62vh;
+  position:relative;
+}
+
+.stack::before,
+.stack::after{
+  content:"";
+  position:absolute;
+  width:100%;
+  height:100%;
+  border-radius:28px;
+  top:0; left:0;
+  pointer-events:none;
+}
+.stack::before{
+  transform:rotate(-4deg) translateY(8px);
+  z-index:0;
+  background:rgba(168,85,247,0.5);
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);
+}
+.stack::after{
+  transform:rotate(-2deg) translateY(4px);
+  z-index:1;
+  background:rgba(78,205,196,0.5);
+  box-shadow:0 10px 28px rgba(0,0,0,0.35);
+}
+
+/* ======= CARD ======= */
+.card{
+  position:absolute;
+  width:100%;
+  height:100%;
+  border-radius:28px;
+  overflow:hidden;
+  background:white;
+  box-shadow:0 16px 40px rgba(0,0,0,0.4);
+  touch-action:none;
+  z-index:2;
+  transition:box-shadow 0.2s;
+}
+
+.card img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  background:#fff;
+}
+
+.card-content{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  padding:20px;
+  background:linear-gradient(to top, rgba(15,15,40,0.92) 60%, transparent);
+}
+.card-content h2{
+  color:white;
+  margin:0 0 4px;
+  font-family:'Fredoka One',cursive;
+  font-size:22px;
+  letter-spacing:0.5px;
+  text-shadow:0 2px 8px rgba(0,0,0,0.5);
+}
+.card-content p{
+  color:rgba(255,255,255,0.85);
+  margin:0;
+  font-size:13px;
+  font-weight:700;
+}
+
+/* swipe indicator overlays */
+.swipe-label{
+  position:absolute;
+  top:24px;
+  padding:8px 18px;
+  border-radius:50px;
+  font-family:'Fredoka One',cursive;
+  font-size:26px;
+  border:4px solid;
+  opacity:0;
+  pointer-events:none;
+  transform:rotate(-15deg);
+  transition:opacity 0.1s;
+  z-index:10;
+}
+.swipe-label.like{
+  left:16px;
+  color:#4ECDC4;
+  border-color:#4ECDC4;
+  background:rgba(78,205,196,0.15);
+  text-shadow:0 0 12px rgba(78,205,196,0.8);
+}
+.swipe-label.nope{
+  right:16px;
+  color:#FF6B6B;
+  border-color:#FF6B6B;
+  background:rgba(255,107,107,0.15);
+  text-shadow:0 0 12px rgba(255,107,107,0.8);
+  transform:rotate(15deg);
+}
+
+/* floating emoji during drag */
+.float-emoji{
+  position:fixed;
+  font-size:32px;
+  pointer-events:none;
+  z-index:999;
+  animation:floatUp 1.2s ease-out forwards;
+}
+@keyframes floatUp{
+  0%{ opacity:1; transform:translateY(0) scale(1) rotate(0deg); }
+  100%{ opacity:0; transform:translateY(-160px) scale(1.5) rotate(20deg); }
+}
+
+/* ======= BUTTONS ======= */
+.actions{
+  display:flex;
+  gap:20px;
+}
+
+.actions button{
+  padding:14px 22px;
+  border:none;
+  border-radius:18px;
+  color:white;
+  font-weight:900;
+  cursor:pointer;
+  font-family:'Nunito',sans-serif;
+  font-size:15px;
+  position:relative;
+  transition:transform 0.15s, box-shadow 0.15s;
+  animation:buttonBounce 2.5s ease-in-out infinite;
+}
+.actions button:nth-child(2){ animation-delay:0.4s; }
+
+@keyframes buttonBounce{
+  0%,100%{ transform:translateY(0); }
+  50%{ transform:translateY(-5px); }
+}
+
+.actions button:active{
+  transform:scale(0.9) translateY(3px) !important;
+  animation:none;
+}
+
+.btn-nope{
+  background:linear-gradient(135deg,#FF6B6B,#FF4757);
+  box-shadow:0 6px 0 #c0392b, 0 8px 20px rgba(255,107,107,0.4);
+}
+.btn-nope:hover{ box-shadow:0 8px 0 #c0392b, 0 12px 28px rgba(255,107,107,0.5); }
+
+.btn-like{
+  background:linear-gradient(135deg,#4ECDC4,#26de81);
+  box-shadow:0 6px 0 #1abc9c, 0 8px 20px rgba(78,205,196,0.4);
+}
+.btn-like:hover{ box-shadow:0 8px 0 #1abc9c, 0 12px 28px rgba(78,205,196,0.5); }
+
+/* ======= MATCH SCREEN ======= */
+.match{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:linear-gradient(160deg,#1a1a2e 0%,#0f3460 50%,#1a1a2e 100%);
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:14px;
+  z-index:999;
+  padding:28px 20px;
+  overflow:hidden;
+}
+.match.show{ display:flex; }
+
+/* confetti canvas */
+#confettiCanvas{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+}
+
+.match > *{ position:relative; z-index:1; }
+
+.match-ring{
+  width:clamp(90px,18vw,120px);
+  height:clamp(90px,18vw,120px);
+  border-radius:50%;
+  background:linear-gradient(135deg,#FF6B6B,#FFE66D,#4ECDC4,#A855F7);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  animation:matchPop 0.7s cubic-bezier(0.175,0.885,0.32,1.275) both;
+  box-shadow:0 0 40px rgba(255,230,109,0.6), 0 0 80px rgba(255,107,107,0.3);
+}
+.match-ring .inner{
+  width:76%;
+  height:76%;
+  border-radius:50%;
+  background:var(--bg1);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:clamp(32px,7vw,52px);
+}
+
+@keyframes matchPop{
+  0%{ transform:scale(0) rotate(-180deg); opacity:0; }
+  70%{ transform:scale(1.2) rotate(10deg); }
+  100%{ transform:scale(1) rotate(0deg); opacity:1; }
+}
+
+.match-title{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(28px,7vw,44px);
+  color:#FFE66D;
+  text-align:center;
+  margin:0;
+  text-shadow:0 0 30px rgba(255,230,109,0.7), 0 4px 0 rgba(0,0,0,0.4);
+  animation:slideUp 0.5s 0.3s ease both;
+}
+
+#matchText{
+  font-size:clamp(15px,3.5vw,22px);
+  font-weight:900;
+  color:white;
+  text-align:center;
+  margin:0;
+  max-width:90vw;
+  animation:slideUp 0.5s 0.45s ease both;
+  text-shadow:0 2px 8px rgba(0,0,0,0.5);
+}
+
+@keyframes slideUp{
+  from{ opacity:0; transform:translateY(24px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+
+.match a{
+  width:min(90vw, 300px);
+  padding:clamp(12px,2.5vh,16px) 18px;
+  border-radius:18px;
+  text-decoration:none;
+  font-weight:900;
+  display:block;
+  text-align:center;
+  font-size:clamp(14px,2.5vw,16px);
+  font-family:'Nunito',sans-serif;
+  transition:transform 0.15s, box-shadow 0.15s;
+  animation:slideUp 0.5s ease both;
+}
+.match a:nth-of-type(1){ animation-delay:0.55s; }
+.match a:nth-of-type(2){ animation-delay:0.65s; }
+
+.ft-btn{
+  background:linear-gradient(135deg,#FF6B6B,#FF8E53);
+  color:white;
+  box-shadow:0 6px 0 #c0392b, 0 8px 24px rgba(255,107,107,0.4);
+}
+.company-btn{
+  background:linear-gradient(135deg,#4ECDC4,#26de81);
+  color:white;
+  box-shadow:0 6px 0 #1abc9c, 0 8px 24px rgba(78,205,196,0.4);
+}
+.match a:hover{ transform:translateY(-3px) scale(1.03); }
+.match a:active{ transform:scale(0.96) translateY(3px); }
+
+.match button{
+  padding:clamp(10px,2vh,14px) 22px;
+  border:3px solid rgba(255,255,255,0.3);
+  border-radius:16px;
+  background:rgba(255,255,255,0.12);
+  color:white;
+  font-weight:900;
+  cursor:pointer;
+  font-size:clamp(13px,2.5vw,15px);
+  font-family:'Nunito',sans-serif;
+  backdrop-filter:blur(8px);
+  transition:all 0.2s;
+  animation:slideUp 0.5s 0.75s ease both;
+}
+.match button:hover{ background:rgba(255,255,255,0.22); transform:translateY(-2px); }
+.match button:active{ transform:scale(0.95); }
+
+/* score badge */
+.score-badge{
+  position:fixed;
+  top:108px;
+  right:16px;
+  background:linear-gradient(135deg,#FFE66D,#FF8E53);
+  border-radius:50px;
+  padding:5px 12px;
+  font-family:'Fredoka One',cursive;
+  font-size:15px;
+  color:#1a1a2e;
+  z-index:11;
+  box-shadow:0 4px 12px rgba(255,230,109,0.5);
+  animation:scorePop 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+@keyframes scorePop{
+  0%{ transform:scale(0.5); }
+  70%{ transform:scale(1.2); }
+  100%{ transform:scale(1); }
+}
+</style>
+</head>
+<body>
+
+<!-- Animated BG -->
+<div class="bg-canvas">
+  <div class="wave"></div>
+  <div class="wave"></div>
+  <div class="wave"></div>
+</div>
+
+<div class="header-wrap">
+  <div class="header1">Match avec ton emploi</div>
+  <div class="header2">🎮 France Travail X La Route du Rhum 🎮</div>
+</div>
+
+<div class="spacer"></div>
+<div class="filters" id="filters"></div>
+<p class="intro-text">👆 Swipe à droite si le métier t'intéresse, à gauche sinon. Un match = une opportunité !</p>
+
+<div class="screen">
+  <div class="stack" id="stack"></div>
+  <div class="actions">
+    <button class="btn-nope" onclick="forceSwipe('left')">❌ Pas pour moi</button>
+    <button class="btn-like" onclick="forceSwipe('right')">❤️ J'aime !</button>
+  </div>
+</div>
+
+<div id="scoreBadge" class="score-badge" style="display:none"></div>
+<div class="match" id="match">
+  <canvas id="confettiCanvas"></canvas>
+</div>
+
+<script>
+/* ============ DATA ============ */
+let data = {};
+let currentList = [];
+let currentIndex = 0;
+let matchCount = 0;
+
+async function loadData(){
+  const res = await fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vSM_YU-q5RRw9vsihxuJaZ-kStFXupQ9bt_dcBXy3-rkIKQj297iAQXyJ_6DcuFkw4XEDRkyZhfEH7a/pub?output=csv");
+  const text = await res.text();
+  const rows = text.split("\n").slice(1);
+  rows.forEach(r=>{
+    const c = r.split(",");
+    if(!c[0]) return;
+    if(!data[c[0]]) data[c[0]]=[];
+    data[c[0]].push({ name:c[1], desc:c[2], img:c[3], url:c[4] });
+  });
+  buildFilters();
+  setFilter("all");
+}
+
+/* ============ FILTERS ============ */
+function buildFilters(){
+  const container = document.getElementById("filters");
+  container.innerHTML = "";
+  const allBtn = document.createElement("button");
+  allBtn.textContent = "🎯 Tous";
+  allBtn.classList.add("active");
+  allBtn.onclick = (e)=>{ setFilter("all"); setActive(e.target); };
+  container.appendChild(allBtn);
+  Object.keys(data).forEach(cat=>{
+    const btn=document.createElement("button");
+    btn.textContent=cat;
+    btn.onclick=(e)=>{ setFilter(cat); setActive(e.target); };
+    container.appendChild(btn);
+  });
+  function setActive(btn){
+    document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+  }
+}
+
+function setFilter(cat){
+  currentList = [];
+  if(cat==="all"){ Object.values(data).forEach(a=>currentList=currentList.concat(a)); }
+  else { currentList=data[cat]; }
+  currentIndex=0;
+  render();
+}
+
+/* ============ RENDER ============ */
+function render(){
+  const stack=document.getElementById("stack");
+  stack.innerHTML="";
+  if(currentIndex>=currentList.length){ currentIndex=0; }
+  if(!currentList.length){
+    stack.innerHTML=`<p style="color:white;text-align:center;font-family:'Fredoka One',cursive;font-size:20px;margin-top:40px;">Plus de cartes 🎴</p>`;
+    return;
+  }
+  const c=currentList[currentIndex];
+  const card=document.createElement("div");
+  card.className="card";
+  card.innerHTML=`
+    <img src="${c.img}">
+    <div class="swipe-label like">❤️ LIKE</div>
+    <div class="swipe-label nope">NOPE ❌</div>
+    <div class="card-content"><h2>${c.name}</h2><p>${c.desc}</p></div>
+  `;
+
+  let startX=0, startY=0, dragging=false, lastDiff=0;
+  let emojiInterval=null;
+
+  const likeLabel = card.querySelector('.swipe-label.like');
+  const nopeLabel = card.querySelector('.swipe-label.nope');
+
+  const LIKE_EMOJIS  = ['❤️','🎉','✨','🌟','💚','🚀','🎊','💡'];
+  const NOPE_EMOJIS  = ['💨','😅','🙈','⚡','💫','🌀','😬','👻'];
+
+  function spawnEmoji(dir){
+    const list = dir==='right' ? LIKE_EMOJIS : NOPE_EMOJIS;
+    const em = document.createElement('div');
+    em.className='float-emoji';
+    em.textContent = list[Math.floor(Math.random()*list.length)];
+    const rect = card.getBoundingClientRect();
+    em.style.left = (rect.left + rect.width/2 + (Math.random()-0.5)*80) + 'px';
+    em.style.top  = (rect.top  + rect.height/2 + (Math.random()-0.5)*60) + 'px';
+    document.body.appendChild(em);
+    setTimeout(()=>em.remove(), 1300);
+  }
+
+  card.addEventListener("pointerdown",e=>{
+    startX=e.clientX; startY=e.clientY; dragging=true;
+    card.setPointerCapture(e.pointerId);
+    card.style.transition="none";
+    emojiInterval = setInterval(()=>{ if(Math.abs(lastDiff)>40) spawnEmoji(lastDiff>0?'right':'left'); }, 300);
+  });
+
+  card.addEventListener("pointermove",e=>{
+    if(!dragging) return;
+    const diff=e.clientX-startX;
+    lastDiff=diff;
+    card.style.transform=`translateX(${diff}px) rotate(${diff/14}deg)`;
+    const pct = Math.min(Math.abs(diff)/120, 1);
+    likeLabel.style.opacity = diff > 0 ? pct : 0;
+    nopeLabel.style.opacity = diff < 0 ? pct : 0;
+  });
+
+  card.addEventListener("pointerup",e=>{
+    dragging=false;
+    clearInterval(emojiInterval);
+    const diff=e.clientX-startX;
+    card.style.transition="0.3s ease";
+    if(diff>100) swipe("right");
+    else if(diff<-100) swipe("left");
+    else{
+      card.style.transform="translateX(0)";
+      likeLabel.style.opacity=0;
+      nopeLabel.style.opacity=0;
+    }
+  });
+
+  stack.appendChild(card);
+}
+
+/* ============ SWIPE ============ */
+function swipe(dir){
+  const card=document.querySelector(".card");
+  if(!card) return;
+  const c=currentList[currentIndex];
+  card.style.transition="0.35s ease";
+  card.style.transform = dir==="right"
+    ? "translateX(1200px) rotate(25deg)"
+    : "translateX(-1200px) rotate(-25deg)";
+  currentIndex++;
+  setTimeout(()=>{ if(dir==="right") showMatch(c); else render(); }, 350);
+}
+
+function forceSwipe(dir){ swipe(dir); }
+
+/* ============ MATCH ============ */
+function showMatch(c){
+  matchCount++;
+  updateScore();
+  try{
+    const audio = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3");
+    audio.play();
+  }catch(e){}
+  if(navigator.vibrate){ navigator.vibrate([200,100,200,100,300]); }
+
+  const m=document.getElementById("match");
+  m.innerHTML=`
+    <canvas id="confettiCanvas"></canvas>
+    <div class="match-ring"><div class="inner">🤝</div></div>
+    <h1 class="match-title">C'EST UN MATCH !</h1>
+    <p id="matchText">Tu as matché avec <strong>${c.name}</strong> !</p>
+    <a class="ft-btn" href="https://recrute.francetravail.fr/page-employeur/" target="_blank">🔍 Offres France Travail</a>
+    <a class="company-btn" href="${c.url||'#'}" target="_blank">🌐 Site de l'entreprise</a>
+    <button onclick="restart()">🎮 Continuer à jouer</button>
+  `;
+  m.classList.add("show");
+  launchConfetti();
+}
+
+function restart(){
+  document.getElementById("match").classList.remove("show");
+  render();
+}
+
+/* ============ SCORE ============ */
+function updateScore(){
+  const badge = document.getElementById('scoreBadge');
+  badge.style.display='block';
+  badge.textContent=`⭐ ${matchCount} match${matchCount>1?'s':''}`;
+  badge.style.animation='none';
+  void badge.offsetWidth;
+  badge.style.animation='scorePop 0.4s cubic-bezier(0.175,0.885,0.32,1.275)';
+}
+
+/* ============ CONFETTI ============ */
+function launchConfetti(){
+  const canvas = document.getElementById('confettiCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const colors=['#FF6B6B','#FFE66D','#4ECDC4','#A855F7','#FF8E53','#26de81','#fff'];
+  const pieces = Array.from({length:120},()=>({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height - canvas.height,
+    r: Math.random()*8+4,
+    d: Math.random()*80+40,
+    color: colors[Math.floor(Math.random()*colors.length)],
+    tilt: Math.random()*10-10,
+    tiltAngle:0,
+    tiltAngleInc: Math.random()*0.07+0.05,
+    shape: Math.random()>0.5?'circle':'rect',
+  }));
+
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{
+      ctx.beginPath();
+      ctx.fillStyle=p.color;
+      p.tiltAngle+=p.tiltAngleInc;
+      p.y+=Math.cos(frame/20+p.d)+2.5;
+      p.x+=Math.sin(frame/30)*2;
+      p.tilt=Math.sin(p.tiltAngle)*12;
+      if(p.shape==='circle'){
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      } else {
+        ctx.save();
+        ctx.translate(p.x,p.y);
+        ctx.rotate(p.tilt*Math.PI/180);
+        ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);
+        ctx.restore();
+      }
+      ctx.fill();
+    });
+    frame++;
+    if(frame<200) requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* ============ STARS BG ============ */
+function createStars(){
+  const bg = document.querySelector('.bg-canvas');
+  for(let i=0;i<40;i++){
+    const s = document.createElement('div');
+    s.className='star';
+    const size = Math.random()*3+1;
+    s.style.cssText=`width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*60}%;animation-delay:${Math.random()*4}s;animation-duration:${Math.random()*3+2}s;`;
+    bg.appendChild(s);
+  }
+}
+createStars();
+
+loadData();
+</script>
+</body>
+</html>
