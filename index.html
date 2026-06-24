@@ -626,6 +626,14 @@ body{
 @media (min-width:750px){
   .stack{ width:66vw; max-width:560px; max-height:80vh; }
 }
+
+  /* ====WPA===*/
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1D1E3C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Match avec ton emploi">
+  
 </style>
 </head>
 <body>
@@ -897,6 +905,12 @@ document.addEventListener('click',e=>{
 });
 
 loadData();
+
+  if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js");
+  });
+}
 </script>
 </body>
 </html>
