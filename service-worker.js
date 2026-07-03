@@ -1,4 +1,4 @@
-const CACHE_NAME = "match-emploi-v1";
+const CACHE_NAME = "connect-emploi-v1";
 
 const urlsToCache = [
   "./",
